@@ -1,8 +1,7 @@
-POST  http://localhost:3000/users
+POST  http://localhost:3000/localhost:3000/cards
 Content-Type: application/json
 
 {
-  "name": "name",
-  "about": "name",
-  "avatar": "name"
+  "name": "chloe",
+  "link": "nobody",
 }
