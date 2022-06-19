@@ -1,7 +1,0 @@
-POST  http://localhost:3000/localhost:3000/cards
-Content-Type: application/json
-
-{
-  "name": "chloe",
-  "link": "nobody",
-}

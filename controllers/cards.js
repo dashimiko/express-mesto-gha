@@ -7,10 +7,8 @@ const getAllCards = (req, res) => {
 };
 
 const createCard = (req, res) => {
-  const userId = req.user._id;
-
   const { name, link } = req.body;
-  Card.create({ name, link, owner: userId }).then((card) => {
+  Card.create({ name, link, owner: req.user._id }).then((card) => {
     res.status(201).send({ card });
   });
 };
@@ -22,8 +20,24 @@ const deleteCard = (req, res) => {
   });
 };
 
+const likeCard = (req, res) => {
+  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+    .then((card) => {
+      res.send(card);
+    });
+};
+
+const dislikeCard = (req, res) => {
+  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
+    .then((card) => {
+      res.send(card);
+    });
+};
+
 module.exports = {
   getAllCards,
   createCard,
   deleteCard,
+  likeCard,
+  dislikeCard,
 };
