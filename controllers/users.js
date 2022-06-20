@@ -3,7 +3,7 @@ const User = require('../models/user');
 const getAllUser = (req, res) => {
   User.find({}).then((users) => {
     res.status(200).send(users);
-  }).catch((err) => res.status(500).send({ message: `Произошла ошибка ${err.name} ${err.message}` }));
+  }).catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
 };
 
 const getIdUser = (req, res) => {
@@ -17,7 +17,7 @@ const getIdUser = (req, res) => {
     if (err.name === 'CastError') {
       res.status(400).send({ message: 'Пользователь по указанному _id не найден.' });
     } else {
-      res.status(500).send({ message: `Произошла ошибка ${err.name} ${err.message}` });
+      res.status(500).send({ message: 'Что-то пошло не так' });
     }
   });
 };
@@ -28,9 +28,9 @@ const createUser = (req, res) => {
     res.status(201).send(user);
   }).catch((err) => {
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля. Заполните поля, в них должно быть от 2 до 30 символов' });
     } else {
-      res.status(500).send({ message: `Произошла ошибка ${err.name} ${err.message}` });
+      res.status(500).send({ message: 'Что-то пошло не так' });
     }
   });
 };
@@ -47,10 +47,10 @@ const updateUser = (req, res) => {
       return;
     } res.status(200).send(user);
   }).catch((err) => {
-    if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+    if (err.name === 'ValidationError' || err.name === 'CastError') {
+      res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля. Заполните поля, в них должно быть от 2 до 30 символов' });
     } else {
-      res.status(500).send({ message: `Произошла ошибка ${err.name} ${err.message}` });
+      res.status(500).send({ message: 'Что-то пошло не так' });
     }
   });
 };
@@ -68,10 +68,10 @@ const updateAvatar = (req, res) => {
     }
     res.status(200).send(user);
   }).catch((err) => {
-    if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
+    if (err.name === 'ValidationError' || err.name === 'CastError') {
+      res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара. Заполните поле' });
     } else {
-      res.status(500).send({ message: `Произошла ошибка ${err.name} ${err.message}` });
+      res.status(500).send({ message: 'Что-то пошло не так' });
     }
   });
 };

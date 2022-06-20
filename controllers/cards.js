@@ -3,7 +3,7 @@ const Card = require('../models/card');
 const getAllCards = (req, res) => {
   Card.find({}).then((cards) => {
     res.status(200).send(cards);
-  }).catch((err) => res.status(500).send({ message: `Произошла ошибка ${err.name} ${err.message}` }));
+  }).catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
 };
 
 const createCard = (req, res) => {
@@ -12,9 +12,9 @@ const createCard = (req, res) => {
     res.status(201).send({ card });
   }).catch((err) => {
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
+      res.status(400).send({ message: 'Переданы некорректные данные при создании карточки. Заполните поля' });
     } else {
-      res.status(500).send({ message: `Произошла ошибка ${err.name} ${err.message}` });
+      res.status(500).send({ message: 'Что-то пошло не так' });
     }
   });
 };
@@ -31,7 +31,7 @@ const deleteCard = (req, res) => {
     if (err.name === 'CastError') {
       res.status(400).send({ message: 'Переданы некорректные данные для удаления карточки.' });
     } else {
-      res.status(500).send({ message: `Произошла ошибка ${err.name} ${err.message}` });
+      res.status(500).send({ message: 'Что-то пошло не так' });
     }
   });
 };
@@ -48,7 +48,7 @@ const likeCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятия лайка.' });
       } else {
-        res.status(500).send({ message: `Произошла ошибка ${err.name} ${err.message}` });
+        res.status(500).send({ message: 'Что-то пошло не так' });
       }
     });
 };
@@ -65,7 +65,7 @@ const dislikeCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
       } else {
-        res.status(500).send({ message: `Произошла ошибка ${err.name} ${err.message}` });
+        res.status(500).send({ message: 'Что-то пошло не так' });
       }
     });
 };

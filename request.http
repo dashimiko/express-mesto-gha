@@ -1,1 +1,8 @@
-get http://localhost:3000/users/62a897f6824b89c90ac25111
+post http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "name" : "f",
+  "about" : "к",
+  "avatar" : "братец"
+}

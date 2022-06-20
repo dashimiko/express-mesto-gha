@@ -8,7 +8,7 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/mydb');
+mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(express.json());
 
@@ -16,11 +16,6 @@ app.use((req, res, next) => {
   req.user = {
     _id: '62ae4768510cc89af20a96d7',
   };
-  next();
-});
-
-app.use((req, res, next) => {
-  console.log(req.method, req.path);
   next();
 });
 
