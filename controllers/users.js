@@ -8,10 +8,14 @@ const getAllUser = (req, res) => {
 
 const getIdUser = (req, res) => {
   User.findOne({ _id: req.params.userId }).then((user) => {
+    if (!user) {
+      res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+      return;
+    }
     res.status(200).send(user);
   }).catch((err) => {
     if (err.name === 'CastError') {
-      res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      res.status(400).send({ message: 'Пользователь по указанному _id не найден.' });
     } else {
       res.status(500).send({ message: `Произошла ошибка ${err.name} ${err.message}` });
     }
@@ -41,7 +45,7 @@ const updateUser = (req, res) => {
     if (!user) {
       res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
       return;
-    } res.status(201).send(user);
+    } res.status(200).send(user);
   }).catch((err) => {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
@@ -62,7 +66,7 @@ const updateAvatar = (req, res) => {
       res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
       return;
     }
-    res.status(201).send(user);
+    res.status(200).send(user);
   }).catch((err) => {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
