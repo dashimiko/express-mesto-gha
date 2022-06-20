@@ -1,6 +1,0 @@
-patch http://localhost:3000/users/me/avatar
-Content-Type: application/json
-
-{
-  "avatar" : "отредактировано"
-}
