@@ -2,7 +2,6 @@ post http://localhost:3000/users
 Content-Type: application/json
 
 {
-  "name" : "f",
-  "about" : "к",
-  "avatar" : "братец"
+  "email" : "dasha@list.ru",
+  "password" : "sky333sky"
 }

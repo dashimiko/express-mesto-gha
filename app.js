@@ -1,6 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
+const {
+  login,
+  createUser,
+} = require('./controllers/users');
+
+const { userAuthorization } = require('./middlewares/auth');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 
@@ -19,8 +25,13 @@ app.use((req, res, next) => {
   next();
 });
 
+app.post('/signin', login);
+app.post('/signup', createUser);
+
+app.use(userAuthorization);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
+
 app.use((req, res) => {
   res.status(404).send({ message: 'Вы обратились к несуществующей странице' });
 });

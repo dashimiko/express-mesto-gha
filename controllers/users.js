@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const getAllUser = (req, res) => {
@@ -23,17 +25,34 @@ const getIdUser = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar }).then((user) => {
-    res.status(201).send(user);
-  }).catch((err) => {
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
+  bcrypt.hash(password, 10).then((hash) => User.create({
+    name,
+    about,
+    avatar,
+    email,
+    password: hash,
+  })).then((user) => res.status(201).send({
+    _id: user._id,
+    name: user.name,
+    about: user.about,
+    avatar: user.avatar,
+    email: user.email,
+    password: user.password,
+  })).catch((err) => {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля. Заполните поля, в них должно быть от 2 до 30 символов' });
     } else {
       res.status(500).send({ message: 'Что-то пошло не так' });
     }
   });
-};
+};// неинформативные ошибки с некеорректным имейлом и паролем
 
 const updateUser = (req, res) => {
   const { name, about } = req.body;
@@ -76,10 +95,28 @@ const updateAvatar = (req, res) => {
   });
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'some-secret-key',
+        { expiresIn: 3600 },
+      );
+      res.send({ token });
+    })
+    .catch(() => {
+      res.status(401).send({ message: 'Что-то пошло не так' });
+    });
+};
+
 module.exports = {
   getAllUser,
   getIdUser,
   createUser,
   updateUser,
   updateAvatar,
+  login,
 };
