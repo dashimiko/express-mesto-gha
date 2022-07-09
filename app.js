@@ -31,6 +31,14 @@ app.use((req, res) => {
   res.status(404).send({ message: 'Вы обратились к несуществующей странице' });
 });
 
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send({
+    message: statusCode === 500 ? 'что-то пошло не так' : message,
+  });
+  next();
+});
+
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });

@@ -4,10 +4,14 @@ const User = require('../models/user');
 
 const MONGO_DUPLICATE_ERROR_CODE = 11000;
 
-const getAllUser = (req, res) => {
+const NotFoundError = require('../errors/authorizationError');
+const BadRequestError = require('../errors/badRequestError');
+const ConflictError = require('../errors/conflictError');
+
+const getAllUser = (req, res, next) => {
   User.find({}).then((users) => {
     res.status(200).send(users);
-  }).catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
+  }).catch(next);
 };
 
 const getUser = (req, res, next) => {
@@ -16,23 +20,22 @@ const getUser = (req, res, next) => {
     .catch(next);
 };
 
-const getIdUser = (req, res) => {
+const getIdUser = (req, res, next) => {
   User.findOne({ _id: req.params.userId }).then((user) => {
     if (!user) {
-      res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
-      return;
+      throw new NotFoundError('Пользователь по указанному _id не найден.');
     }
     res.status(200).send(user);
   }).catch((err) => {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: 'Пользователь по указанному _id не найден.' });
+      next(new BadRequestError('Пользователь по указанному _id не найден.'));
     } else {
-      res.status(500).send({ message: 'Что-то пошло не так' });
+      next(err);
     }
   });
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -42,8 +45,7 @@ const createUser = (req, res) => {
   } = req.body;
 
   if (!email || !password) {
-    res.status(400).send({ message: 'Не передан email или пароль.' });
-    return;
+    throw new BadRequestError('Не передан email или пароль.');
   }
   bcrypt.hash(password, 10).then((hash) => User.create({
     name,
@@ -52,23 +54,21 @@ const createUser = (req, res) => {
     email,
     password: hash,
   })).then((user) => res.status(201).send({
-    data: {
-      _id: user._id,
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      email: user.email,
-    },
+    _id: user._id,
+    name: user.name,
+    about: user.about,
+    avatar: user.avatar,
+    email: user.email,
   })).catch((err) => {
     if (err.code === MONGO_DUPLICATE_ERROR_CODE) {
-      res.status(409).send({ message: 'email занят' });
+      next(new ConflictError('email занят'));
     } else {
-      res.status(500).send({ message: 'Что-то пошло не так' });
+      next(err);
     }
   });
-};// неинформативные ошибки с некеорректным имейлом и паролем
+};
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -76,19 +76,18 @@ const updateUser = (req, res) => {
     { new: true, runValidators: true },
   ).then((user) => {
     if (!user) {
-      res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
-      return;
+      throw new NotFoundError('Пользователь по указанному _id не найден.');
     } res.status(200).send(user);
   }).catch((err) => {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
-      res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля. Заполните поля, в них должно быть от 2 до 30 символов' });
+      next(new BadRequestError('Переданы некорректные данные при обновлении профиля. Заполните поля, в них должно быть от 2 до 30 символов'));
     } else {
-      res.status(500).send({ message: 'Что-то пошло не так' });
+      next(err);
     }
   });
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -96,15 +95,14 @@ const updateAvatar = (req, res) => {
     { new: true },
   ).then((user) => {
     if (!user) {
-      res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
-      return;
+      throw new NotFoundError('Пользователь по указанному _id не найден.');
     }
     res.status(200).send(user);
   }).catch((err) => {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
-      res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара. Заполните поле' });
+      next(new BadRequestError('Переданы некорректные данные при обновлении аватара. Заполните поле'));
     } else {
-      res.status(500).send({ message: 'Что-то пошло не так' });
+      next(err);
     }
   });
 };
