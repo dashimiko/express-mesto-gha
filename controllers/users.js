@@ -62,6 +62,8 @@ const createUser = (req, res, next) => {
   })).catch((err) => {
     if (err.code === MONGO_DUPLICATE_ERROR_CODE) {
       next(new ConflictError('email занят'));
+    } if (err.name === 'ValidationError' || err.name === 'CastError') {
+      next(new BadRequestError('Переданы некорректные данные при обновлении профиля. Заполните поля, в них должно быть от 2 до 30 символов'));
     } else {
       next(err);
     }
