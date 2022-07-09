@@ -1,7 +1,7 @@
-post http://localhost:3000/users
+POST http://localhost:3000/signin
 Content-Type: application/json
 
 {
-  "email" : "dasha@list.ru",
-  "password" : "sky333sky"
+  "email" : "coco@mail.com",
+  "password" : "password"
 }

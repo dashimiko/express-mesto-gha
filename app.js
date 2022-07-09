@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
+const cookieParser = require('cookie-parser');
+
 const {
   login,
   createUser,
@@ -17,20 +19,13 @@ const app = express();
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(express.json());
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: '62ae4768510cc89af20a96d7',
-  };
-  next();
-});
+app.use(cookieParser());
 
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-app.use(userAuthorization);
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
+app.use('/users', userAuthorization, usersRouter);
+app.use('/cards', userAuthorization, cardsRouter);
 
 app.use((req, res) => {
   res.status(404).send({ message: 'Вы обратились к несуществующей странице' });
