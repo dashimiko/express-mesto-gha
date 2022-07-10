@@ -13,13 +13,13 @@ const { regex } = require('../utils/constants');
 
 router.get('/', getAllUser);
 
+router.get('/me', getUser);
+
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24).required(),
-  }),
+    userId: Joi.string().hex().length(24),
+  }).unknown(true),
 }), getIdUser);
-
-router.get('/me', getUser);
 
 router.patch('/me', celebrate({
   body: Joi.object().keys({
