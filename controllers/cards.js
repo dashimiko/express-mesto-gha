@@ -1,6 +1,7 @@
 const Card = require('../models/card');
-const NotFoundError = require('../errors/authorizationError');
+const NotFoundError = require('../errors/notFoundError');
 const BadRequestError = require('../errors/badRequestError');
+const ForbiddenError = require('../errors/forbiddenError');
 
 const getAllCards = (req, res, next) => {
   Card.find({}).then((cards) => {
@@ -28,7 +29,7 @@ const deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Передан несуществующий _id карточки');
       } else if (!card.owner.equals(owner)) {
-        throw new NotFoundError('Вы можете удалять только созданные вами карточки');
+        throw new ForbiddenError('Вы можете удалять только созданные вами карточки');
       } else {
         card.remove().then(() => res.status(200).send(card));
       }

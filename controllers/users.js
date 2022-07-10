@@ -2,9 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const MONGO_DUPLICATE_ERROR_CODE = 11000;
-
-const NotFoundError = require('../errors/authorizationError');
+const NotFoundError = require('../errors/notFoundError');
 const BadRequestError = require('../errors/badRequestError');
 const ConflictError = require('../errors/conflictError');
 
@@ -12,12 +10,6 @@ const getAllUser = (req, res, next) => {
   User.find({}).then((users) => {
     res.status(200).send(users);
   }).catch(next);
-};
-
-const getUser = (req, res, next) => {
-  User.findById(req.user._id)
-    .then((user) => res.status(200).send({ user }))
-    .catch(next);
 };
 
 const getIdUser = (req, res, next) => {
@@ -33,6 +25,12 @@ const getIdUser = (req, res, next) => {
       next(err);
     }
   });
+};
+
+const getUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => res.status(200).send({ user }))
+    .catch(next);
 };
 
 const createUser = (req, res, next) => {
@@ -60,7 +58,7 @@ const createUser = (req, res, next) => {
     avatar: user.avatar,
     email: user.email,
   })).catch((err) => {
-    if (err.code === MONGO_DUPLICATE_ERROR_CODE) {
+    if (err.code === 11000) {
       next(new ConflictError('email занят'));
     } if (err.name === 'ValidationError' || err.name === 'CastError') {
       next(new BadRequestError('Переданы некорректные данные при обновлении профиля. Заполните поля, в них должно быть от 2 до 30 символов'));
