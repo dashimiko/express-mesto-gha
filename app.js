@@ -1,8 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-
 const { errors, celebrate, Joi } = require('celebrate');
-
 const cookieParser = require('cookie-parser');
 
 const {
@@ -13,7 +11,6 @@ const {
 const { userAuthorization } = require('./middlewares/auth');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
-
 const { regex } = require('./utils/constants');
 
 const { PORT = 3000 } = process.env;
