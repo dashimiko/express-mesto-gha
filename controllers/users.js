@@ -8,7 +8,7 @@ const ConflictError = require('../errors/conflictError');
 
 const getAllUser = (req, res, next) => {
   User.find({}).then((users) => {
-    res.status(200).send(users);
+    res.send(users);
   }).catch(next);
 };
 
@@ -17,7 +17,7 @@ const getIdUser = (req, res, next) => {
     if (!user) {
       throw new NotFoundError('Пользователь по указанному _id не найден.');
     }
-    res.status(200).send(user);
+    res.send(user);
   }).catch((err) => {
     if (err.name === 'CastError') {
       next(new BadRequestError('Пользователь по указанному _id не найден.'));
@@ -29,7 +29,7 @@ const getIdUser = (req, res, next) => {
 
 const getUser = (req, res, next) => {
   User.findById(req.user._id)
-    .then((user) => res.status(200).send({ user }))
+    .then((user) => res.send({ user }))
     .catch(next);
 };
 
@@ -41,17 +41,13 @@ const createUser = (req, res, next) => {
     email,
     password,
   } = req.body;
-
-  if (!email || !password) {
-    throw new BadRequestError('Не передан email или пароль.');
-  }
   bcrypt.hash(password, 10).then((hash) => User.create({
     name,
     about,
     avatar,
     email,
     password: hash,
-  })).then((user) => res.status(201).send({
+  })).then((user) => res.send({
     _id: user._id,
     name: user.name,
     about: user.about,
@@ -60,7 +56,7 @@ const createUser = (req, res, next) => {
   })).catch((err) => {
     if (err.code === 11000) {
       next(new ConflictError('email занят'));
-    } if (err.name === 'ValidationError' || err.name === 'CastError') {
+    } else if (err.name === 'ValidationError' || err.name === 'CastError') {
       next(new BadRequestError('Переданы некорректные данные при обновлении профиля. Заполните поля, в них должно быть от 2 до 30 символов'));
     } else {
       next(err);
@@ -77,7 +73,7 @@ const updateUser = (req, res, next) => {
   ).then((user) => {
     if (!user) {
       throw new NotFoundError('Пользователь по указанному _id не найден.');
-    } res.status(200).send(user);
+    } res.send(user);
   }).catch((err) => {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
       next(new BadRequestError('Переданы некорректные данные при обновлении профиля. Заполните поля, в них должно быть от 2 до 30 символов'));
@@ -97,7 +93,7 @@ const updateAvatar = (req, res, next) => {
     if (!user) {
       throw new NotFoundError('Пользователь по указанному _id не найден.');
     }
-    res.status(200).send(user);
+    res.send(user);
   }).catch((err) => {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
       next(new BadRequestError('Переданы некорректные данные при обновлении аватара. Заполните поле'));

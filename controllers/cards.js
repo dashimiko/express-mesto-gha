@@ -6,14 +6,14 @@ const ForbiddenError = require('../errors/forbiddenError');
 
 const getAllCards = (req, res, next) => {
   Card.find({}).then((cards) => {
-    res.status(200).send(cards);
+    res.send(cards);
   }).catch(next);
 };
 
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id }).then((card) => {
-    res.status(201).send({ card });
+    res.send({ card });
   }).catch((err) => {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
       next(new BadRequestError('Переданы некорректные данные при создании карточки. Заполните поля'));
@@ -32,7 +32,7 @@ const deleteCard = (req, res, next) => {
       } else if (!card.owner.equals(owner)) {
         throw new ForbiddenError('Вы можете удалять только созданные вами карточки');
       } else {
-        card.remove().then(() => res.status(200).send(card));
+        card.remove().then(() => res.send(card));
       }
     }).catch((err) => {
       if (err.name === 'CastError') {
@@ -49,7 +49,7 @@ const likeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Передан несуществующий _id карточки');
       }
-      res.status(200).send(card);
+      res.send(card);
     }).catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные для постановки лайка.'));

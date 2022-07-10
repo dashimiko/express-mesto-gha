@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors, celebrate, Joi } = require('celebrate');
-const cookieParser = require('cookie-parser');
 
 const {
   login,
@@ -12,6 +11,7 @@ const { userAuthorization } = require('./middlewares/auth');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const { regex } = require('./utils/constants');
+const NotFoundError = require('./errors/notFoundError');
 
 const { PORT = 3000 } = process.env;
 
@@ -20,7 +20,6 @@ const app = express();
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(express.json());
-app.use(cookieParser());
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -42,8 +41,8 @@ app.post('/signup', celebrate({
 app.use('/users', userAuthorization, usersRouter);
 app.use('/cards', userAuthorization, cardsRouter);
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Вы обратились к несуществующей странице' });
+app.use((req, res, next) => {
+  next(new NotFoundError('Вы обратились к несуществующей странице'));
 });
 
 app.use(errors());

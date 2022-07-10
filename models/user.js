@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 
 const AuthorizationError = require('../errors/authorizationError');
 
+const { regex } = require('../utils/constants');
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -23,6 +25,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    validator: {
+      validate: {
+        match: [regex, 'Некорректная ссылка. Введите URL адрес '],
+      },
+    },
   },
   email: {
     type: String,
